@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 public class LogProvider {
@@ -21,35 +23,41 @@ public class LogProvider {
 
     private static ServerSocket serverSocket;
 
-    private static Socket clientSocket;
+    private static final List<Socket> clientSockets = new LinkedList<>();
+
+    private static final Random random = new Random();
 
     public static void main(final String[] args) {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            closeConnection();
+            closeConnections();
         }));
 
         final MockNeat mock = MockNeat.threadLocal();
 
         try {
             serverSocket = new ServerSocket(5000);
-            System.out.println("Waiting for a connection...");
-
-            clientSocket = serverSocket.accept();
-            System.out.println("New connection !");
-
-            final Random random = new Random();
-            final PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+            System.out.println("Waiting for connections...");
 
             while (true) {
-                out.println(String.join("\t",
-                        Long.toString(System.currentTimeMillis()),
-                        mock.ipv4s().type(IPv4Type.CLASS_A).val(),
-                        mock.from(URLS).val(),
-                        mock.from(STATUS).val(),
-                        mock.ints().range(100, 5000).valStr()
-                        ));
-                Thread.sleep(random.nextInt(10) + 50);
+                final Socket clientSocket = serverSocket.accept();
+                clientSockets.add(clientSocket);
+
+                System.out.println("New connection !");
+
+                new Thread(() -> {
+                    try {
+                        final PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+
+                        while (true) {
+                            out.println(String.join("\t", Long.toString(System.currentTimeMillis()), mock.ipv4s().type(IPv4Type.CLASS_A).val(), mock.from(URLS).val(), mock.from(STATUS).val(), mock.ints().range(100, 5000).valStr()));
+                            Thread.sleep(random.nextInt(10) + 50);
+                        }
+                    }
+                    catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }).start();
             }
         }
         catch (final Exception ex) {
@@ -57,10 +65,10 @@ public class LogProvider {
         }
     }
 
-    private static void closeConnection() {
+    private static void closeConnections() {
         System.out.println("Stopping server");
         try {
-            if (clientSocket != null) {
+            for (final Socket clientSocket: clientSockets) {
                 clientSocket.close();
             }
 
