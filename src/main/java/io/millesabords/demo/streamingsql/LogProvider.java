@@ -50,7 +50,12 @@ public class LogProvider {
                         final PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
 
                         while (true) {
-                            out.println(String.join("\t", Long.toString(System.currentTimeMillis()), mock.ipv4s().type(IPv4Type.CLASS_A).val(), mock.from(URLS).val(), mock.from(STATUS).val(), mock.ints().range(100, 5000).valStr()));
+                            out.println(String.join("\t",
+                                    Long.toString(System.currentTimeMillis()),
+                                    mock.ipv4s().type(IPv4Type.CLASS_A).val(),
+                                    mock.from(URLS).val(),
+                                    mock.from(STATUS).val(),
+                                    mock.ints().range(100, 5000).valStr()));
                             Thread.sleep(random.nextInt(10) + 50);
                         }
                     }
