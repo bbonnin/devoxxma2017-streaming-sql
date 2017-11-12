@@ -13,21 +13,22 @@ public class LogStreamSqlProcessor extends LogStreamProcessor {
         initEnv();
     }
 
-    public void run() throws Exception {
+    public void run(final String query) throws Exception {
 
         tableEnv.registerDataStream("weblogs", dataset,
                 "ts, ip_address, url, status, nb_bytes, rowtime.rowtime");
-
-        // No STREAM keyword => https://issues.apache.org/jira/browse/FLINK-4546
-        final String query =
-                "SELECT url, TUMBLE_END(rowtime, INTERVAL '10' SECOND), COUNT(*) AS nb_requests " +
-                        "FROM weblogs " +
-                        "GROUP BY TUMBLE(rowtime, INTERVAL '10' SECOND), url";
 
         final Table table = tableEnv.sql(query);
 
         tableEnv.toAppendStream(table, Row.class).print();
 
         execEnv.execute();
+    }
+
+    public void run() throws Exception {
+        // No STREAM keyword => https://issues.apache.org/jira/browse/FLINK-4546
+        run("SELECT url, TUMBLE_END(rowtime, INTERVAL '10' SECOND), COUNT(*) AS nb_requests " +
+                "FROM weblogs " +
+                "GROUP BY TUMBLE(rowtime, INTERVAL '10' SECOND), url");
     }
 }

@@ -4,6 +4,7 @@ package io.millesabords.demo.streamingsql.flink;
 
 //import org.apache.flink.table.api.TableEnvironment;
 
+import org.apache.calcite.adapter.csv.CsvSchemaFactory;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -18,7 +19,7 @@ import org.apache.flink.types.Row;
 public class StaticTableProcessor {
 
     public static void main(final String[] args) throws Exception {
-
+        CsvSchemaFactory y;
         final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
         final BatchTableEnvironment tableEnv = TableEnvironment.getTableEnvironment(env);

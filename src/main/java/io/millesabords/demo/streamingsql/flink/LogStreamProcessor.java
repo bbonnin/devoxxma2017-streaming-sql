@@ -1,5 +1,8 @@
 package io.millesabords.demo.streamingsql.flink;
 
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtMethod;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.streaming.api.TimeCharacteristic;
@@ -55,5 +58,16 @@ public abstract class LogStreamProcessor {
         dataset = stream
                 .map(logMapper)
                 .assignTimestampsAndWatermarks(tsExtractor);
+
+        try {
+            final ClassPool pool = ClassPool.getDefault();
+            final CtClass cc = pool.get("org.apache.flink.types.Row");
+            final CtMethod m = cc.getDeclaredMethod("toString");
+            m.insertAfter("$_ = $_.replace(',', '\\t');");
+            cc.toClass();//writeFile();
+        }
+        catch (final Exception e) {
+            e.printStackTrace();
+        }
     }
 }
