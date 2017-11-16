@@ -144,5 +144,35 @@
                 </dependency>
             </dependencies>
         </profile>
+        <profile>
+            <id>loggen</id>
+            <activation><activeByDefault>false</activeByDefault></activation>
+            <dependencies>
+                <dependency>
+                    <groupId>net.andreinc.mockneat</groupId>
+                    <artifactId>mockneat</artifactId>
+                    <version>0.1.2</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.6.0</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <mainClass>io.millesabords.demo.streamingsql.LogProvider</mainClass>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>

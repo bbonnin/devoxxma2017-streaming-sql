@@ -63,7 +63,7 @@ public abstract class LogStreamProcessor {
             final ClassPool pool = ClassPool.getDefault();
             final CtClass cc = pool.get("org.apache.flink.types.Row");
             final CtMethod m = cc.getDeclaredMethod("toString");
-            m.insertAfter("$_ = $_.replace(',', '\\t');");
+            m.insertAfter("$_ = $_.replace(',', '\\t\\t');");
             cc.toClass();//writeFile();
         }
         catch (final Exception e) {

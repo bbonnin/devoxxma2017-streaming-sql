@@ -15,12 +15,42 @@ public class LogStreamSqlProcessor extends LogStreamProcessor {
 
     public void run(final String query) throws Exception {
 
+        if (query.toLowerCase().trim().startsWith("describe")) {
+            if (query.toLowerCase().trim().contains("weblogs")) {
+                // Just for the demo, to show the schema of the table
+                System.out.println();
+                System.out.println("\tFIELD      | TYPE");
+                System.out.println("\t-----------+--------");
+                System.out.println("\tts         | Time");
+                System.out.println("\tip_address | String");
+                System.out.println("\turl        | String");
+                System.out.println("\tstatus     | String");
+                System.out.println("\tnb_bytes   | Integer");
+                System.out.println();
+                //Time, String, String, String, Integer
+            }
+            else {
+                System.out.println("Unknown entity.");
+            }
+
+//            Thread.currentThread().stop();
+            throw new InterruptedException();
+        }
+
         tableEnv.registerDataStream("weblogs", dataset,
+                "ts, ip_address, url, status, nb_bytes, rowtime.rowtime");
+
+        tableEnv.registerDataStream("weblogs2", dataset,
                 "ts, ip_address, url, status, nb_bytes, rowtime.rowtime");
 
         final Table table = tableEnv.sql(query);
 
-        tableEnv.toAppendStream(table, Row.class).print();
+        if (query.toLowerCase().contains("weblogs2")) {
+            tableEnv.toRetractStream(table, Row.class).print();
+        }
+        else {
+            tableEnv.toAppendStream(table, Row.class).print();
+        }
 
         execEnv.execute();
     }

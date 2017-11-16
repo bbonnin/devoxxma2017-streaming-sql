@@ -1,7 +1,0 @@
-1510425832982:slsl;
-1510425934015:select stream * from weblogs;
-1510426019933:SELECT url, TUMBLE_END(rowtime, INTERVAL '10' SECOND), COUNT(*) AS nb_requests " +\n                "FROM weblogs " +\n                "GROUP BY TUMBLE(rowtime, INTERVAL '10' SECOND), url;
-1510426047193:SELECT url, TUMBLE_END(rowtime, INTERVAL '10' SECOND), COUNT(*) AS nb_requests \nFROM weblogs \nGROUP BY TUMBLE(rowtime, INTERVAL '10' SECOND), url;
-1510426069892:select * from weblogs;
-1510426233107:select url from weblogs;
-1510426298642:select * from weblogs;
